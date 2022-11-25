@@ -94,7 +94,7 @@ export const Task: FC<TaskType> = ({
         <div>
           <div>
             {filesData?.map((f, index) => (
-              <a key={index} href={f.url}>
+              <a key={`${id}` + index} href={f.url}>
                 {f.name}
               </a>
             ))}

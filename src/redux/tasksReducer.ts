@@ -157,6 +157,7 @@ export const UploadFile =
       await tasksAPI.uploadFile(taskId, file)
       const files = await tasksAPI.getFiles(taskId)
       dispatch(actions.setFiles(files, taskId))
+      dispatch(actions.setTasks(getState().task.tasks))
     } catch (e) {
       alert('failed to upload file ' + e)
     }
