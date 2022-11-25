@@ -1,7 +1,13 @@
-import { collection, getDocs, setDoc, doc } from 'firebase/firestore'
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore'
 import { db, storage } from '../firebase'
-import { ref, uploadBytes } from 'firebase/storage'
-import { TaskType } from '../redux/tasksReducer'
+import {
+  getDownloadURL,
+  getMetadata,
+  list,
+  ref,
+  uploadBytes,
+} from 'firebase/storage'
+import { FileData, TaskType } from '../redux/tasksReducer'
 
 export const tasksAPI = {
   getTasks: async () => {
@@ -17,8 +23,24 @@ export const tasksAPI = {
       tasks: newTasks,
     })
   },
-  uploadFile: async (id: number, file: File) => {
+  uploadFile: async (id: string, file: Blob) => {
     const fileRef = ref(storage, `task${id}/${file.name}`)
     await uploadBytes(fileRef, file)
+  },
+  getFiles: async (id: string) => {
+    const folderRef = ref(storage, `task${id}`)
+    const firstPage = await list(folderRef)
+    const files = [] as FileData[]
+    firstPage.items.forEach((file) => {
+      const fileData = {} as FileData
+      getMetadata(file).then((metadata) => {
+        fileData.name = metadata.name
+      })
+      getDownloadURL(file).then((url) => {
+        fileData.url = url
+      })
+      files.push(fileData)
+    })
+    return files
   },
 }

@@ -3,8 +3,10 @@ import {
   deleteTask,
   Dispatch,
   editTask,
+  FileData,
   TaskType,
   toggleComplete,
+  UploadFile,
 } from '../../redux/tasksReducer'
 import { useDispatch } from 'react-redux'
 import styles from './Tasks.module.less'
@@ -18,16 +20,22 @@ export const Task: FC<TaskType> = ({
   endDate,
   isComplete,
   id,
+  files,
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isExpired, setIsExpired] = useState(
     dayjs(endDate, 'DD.MM.YYYY').valueOf() < getTimestamp(new Date())
   )
+  const [filesData, setFilesData] = useState<FileData[]>(files)
   const dispatch: Dispatch = useDispatch()
 
   function getTimestamp(date: Date) {
     return dayjs(dayjs(date).format('DD.MM.YYYY'), 'DD.MM.YYYY').valueOf()
   }
+  useEffect(() => {
+    setFilesData(files)
+    console.log(filesData)
+  }, [files])
 
   useEffect(() => {
     setIsExpired(
@@ -43,10 +51,10 @@ export const Task: FC<TaskType> = ({
     return () => clearTimeout(timeout)
   }, [endDate])
 
-  const taskDelete = (taskId: number) => {
+  const taskDelete = (taskId: string) => {
     dispatch(deleteTask(taskId))
   }
-  const completeToggle = (taskId: number) => {
+  const completeToggle = (taskId: string) => {
     dispatch(toggleComplete(taskId))
   }
 
@@ -57,6 +65,10 @@ export const Task: FC<TaskType> = ({
   const handleSubmit = (data: EditData) => {
     dispatch(editTask(data))
     setIsEditModalOpen(false)
+  }
+
+  const uploadFile = (file: Blob) => {
+    dispatch(UploadFile(id, file))
   }
 
   /*  const buttonStyle = {
@@ -76,7 +88,28 @@ export const Task: FC<TaskType> = ({
         <span>{endDate}</span>
       </div>
       <div className={styles.textContainer}>
-        <p>{text}</p>
+        <div>
+          <p>{text}</p>
+        </div>
+        <div>
+          <div>
+            {filesData?.map((f, index) => (
+              <a key={index} href={f.url}>
+                {f.name}
+              </a>
+            ))}
+          </div>
+          <div>
+            <input
+              type="file"
+              onChange={(event) => {
+                if (event.target.files !== null && event.target.files[0]) {
+                  uploadFile(event.target.files[0])
+                }
+              }}
+            />
+          </div>
+        </div>
       </div>
       <div className={styles.buttons}>
         {isComplete ? (
@@ -121,7 +154,7 @@ export const Task: FC<TaskType> = ({
 }
 
 export type EditData = {
-  id: number
+  id: string
   title: string
   text: string
   endDate: string

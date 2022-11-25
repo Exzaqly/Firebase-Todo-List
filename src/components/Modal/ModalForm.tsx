@@ -109,5 +109,5 @@ type Props = {
   titleValue?: string
   textValue?: string
   endDateValue?: string
-  id?: number
+  id?: string
 }

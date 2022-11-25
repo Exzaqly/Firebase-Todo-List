@@ -2,12 +2,14 @@ import { AppStateType, BaseThunk, InferActionsType } from './store'
 import { ThunkDispatch } from 'redux-thunk'
 import { tasksAPI } from '../api/api'
 import { EditData } from '../components/Tasks/Task'
+import { v1 } from 'uuid'
 
 const ADD_TASK = 'tasks/ADD_TASK'
 const DELETE_TASK = 'tasks/DELETE_TASK'
 const TOGGLE_COMPLETE = 'tasks/TOGGLE_COMPLETE'
 const EDIT_TASK = 'tasks/EDIT_TASK'
 const SET_TASKS = 'tasks/SET_TASKS'
+const SET_FILES = 'tasks/SET_FILES'
 
 let initialState = {
   tasks: [] as TaskType[],
@@ -60,6 +62,17 @@ const tasksReducer = (
         tasks: [...Object.values(action.payload)],
       }
     }
+    case SET_FILES: {
+      return {
+        ...state,
+        tasks: state.tasks.map((t) => {
+          if (t.id === action.payload.taskId) {
+            t.files = action.payload.files
+          }
+          return t
+        }),
+      }
+    }
     default:
       return state
   }
@@ -67,29 +80,31 @@ const tasksReducer = (
 
 export const actions = {
   addTask: (task: TaskType) => ({ type: ADD_TASK, payload: task } as const),
-  deleteTask: (taskId: number) =>
+  deleteTask: (taskId: string) =>
     ({ type: DELETE_TASK, payload: { taskId } } as const),
-  toggleComplete: (taskId: number) =>
+  toggleComplete: (taskId: string) =>
     ({ type: TOGGLE_COMPLETE, payload: { taskId } } as const),
-  editTask: (taskId: number, title: string, text: string, endDate: string) =>
+  editTask: (taskId: string, title: string, text: string, endDate: string) =>
     ({
       type: EDIT_TASK,
       payload: { taskId, title, text, endDate: endDate },
     } as const),
   setTasks: (tasks: TaskType[]) =>
     ({ type: SET_TASKS, payload: tasks } as const),
+  setFiles: (files: FileData[], taskId: string) =>
+    ({ type: SET_FILES, payload: { files, taskId } } as const),
 }
 
 export const addTask =
-  (task: any): Thunk =>
+  (task: TaskType): Thunk =>
   async (dispatch, getState) => {
     const newTask = {
       ...task,
-      id: getState().task.tasks.length + 1,
+      id: v1(),
       isComplete: false,
+      files: [],
     }
     try {
-      await tasksAPI.uploadFile(newTask.id, task.files)
       dispatch(actions.addTask(newTask))
 
       await tasksAPI.setTasks(getState().task.tasks)
@@ -108,7 +123,7 @@ export const editTask =
     }
   }
 export const deleteTask =
-  (taskId: number): Thunk =>
+  (taskId: string): Thunk =>
   async (dispatch, getState) => {
     try {
       dispatch(actions.deleteTask(taskId))
@@ -118,7 +133,7 @@ export const deleteTask =
     }
   }
 export const toggleComplete =
-  (taskId: number): Thunk =>
+  (taskId: string): Thunk =>
   async (dispatch, getState) => {
     try {
       dispatch(actions.toggleComplete(taskId))
@@ -135,6 +150,17 @@ export const getTasks = (): Thunk => async (dispatch, getState) => {
     alert('failed to load tasks ' + e)
   }
 }
+export const UploadFile =
+  (taskId: string, file: Blob): Thunk =>
+  async (dispatch, getState) => {
+    try {
+      await tasksAPI.uploadFile(taskId, file)
+      const files = await tasksAPI.getFiles(taskId)
+      dispatch(actions.setFiles(files, taskId))
+    } catch (e) {
+      alert('failed to upload file ' + e)
+    }
+  }
 
 export default tasksReducer
 type Thunk = BaseThunk<Actions, void>
@@ -153,5 +179,11 @@ export type TaskType = {
   text: string
   endDate: string
   isComplete: boolean
-  id: number
+  id: string
+  files: FileData[]
+}
+
+export type FileData = {
+  name: string
+  url: string
 }

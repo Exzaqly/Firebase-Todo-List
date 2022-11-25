@@ -17,6 +17,7 @@ export const Tasks: FC = () => {
             endDate={t.endDate}
             isComplete={t.isComplete}
             id={t.id}
+            files={t.files}
           />
         ))}
       </div>
