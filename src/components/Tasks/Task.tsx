@@ -38,6 +38,12 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
     setIsExpired(
       dayjs(endDate, 'DD.MM.YYYY').valueOf() < getTimestamp(new Date())
     )
+    if (isExpired) return
+    const timeout = setTimeout(
+      () => setIsExpired(true),
+      dayjs(endDate, 'DD.MM.YYYY').valueOf() - getTimestamp(new Date())
+    )
+    return () => clearTimeout(timeout)
   }, [endDate])
 
   const taskDelete = (taskId: string) => {
