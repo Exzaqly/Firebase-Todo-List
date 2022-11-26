@@ -1,11 +1,8 @@
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { TaskType } from '../../redux/tasksReducer'
 import styles from './ModalForm.module.less'
 import dayjs from 'dayjs'
-import { Simulate } from 'react-dom/test-utils'
-import error = Simulate.error
-import { tasksAPI } from '../../api/api'
 
 const customParseFormat = require('dayjs/plugin/customParseFormat')
 dayjs.extend(customParseFormat)
@@ -88,9 +85,6 @@ export const ModalForm: FC<Props> = ({
             {errors?.endDate?.type === 'required' && (
               <p className={styles.error}>This field is required</p>
             )}
-          </div>
-          <div>
-            <input className={styles.input} type="file" />
           </div>
           <button type={'submit'} onClick={handleSubmit(handleAcceptCallback)}>
             Accept

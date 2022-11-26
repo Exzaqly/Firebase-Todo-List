@@ -1,12 +1,11 @@
-import { FC, useEffect, useState } from 'react'
+import { ChangeEvent, FC, useEffect, useState } from 'react'
 import {
   deleteTask,
   Dispatch,
   editTask,
-  FileData,
   TaskType,
   toggleComplete,
-  UploadFile,
+  uploadFile,
 } from '../../redux/tasksReducer'
 import { useDispatch } from 'react-redux'
 import styles from './Tasks.module.less'
@@ -14,7 +13,7 @@ import cn from 'classnames'
 import { ModalForm } from '../Modal/ModalForm'
 import dayjs from 'dayjs'
 
-export const Task: FC<TaskType> = ({
+export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
   title,
   text,
   endDate,
@@ -26,16 +25,11 @@ export const Task: FC<TaskType> = ({
   const [isExpired, setIsExpired] = useState(
     dayjs(endDate, 'DD.MM.YYYY').valueOf() < getTimestamp(new Date())
   )
-  const [filesData, setFilesData] = useState<FileData[]>(files)
   const dispatch: Dispatch = useDispatch()
 
   function getTimestamp(date: Date) {
     return dayjs(dayjs(date).format('DD.MM.YYYY'), 'DD.MM.YYYY').valueOf()
   }
-  useEffect(() => {
-    setFilesData(files)
-    console.log(filesData)
-  }, [files])
 
   useEffect(() => {
     setIsExpired(
@@ -55,7 +49,7 @@ export const Task: FC<TaskType> = ({
     dispatch(deleteTask(taskId))
   }
   const completeToggle = (taskId: string) => {
-    dispatch(toggleComplete(taskId))
+    dispatch(toggleComplete(taskId, !isComplete))
   }
 
   const showModal = () => {
@@ -67,8 +61,12 @@ export const Task: FC<TaskType> = ({
     setIsEditModalOpen(false)
   }
 
-  const uploadFile = (file: Blob) => {
-    dispatch(UploadFile(id, file))
+  const onFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files !== null && e.target.files[0]) {
+      dispatch(uploadFile(id, e.target.files[0]))
+      // @ts-ignore reset file input
+      e.target.value = null;
+    }
   }
 
   /*  const buttonStyle = {
@@ -93,42 +91,28 @@ export const Task: FC<TaskType> = ({
         </div>
         <div>
           <div>
-            {filesData?.map((f, index) => (
-              <a key={`${id}` + index} href={f.url}>
-                {f.name}
-              </a>
+            {files?.map((f, index) => (
+                <a key={f.id} href={f.url}>
+                  {f.name}
+                </a>
             ))}
           </div>
           <div>
             <input
               type="file"
-              onChange={(event) => {
-                if (event.target.files !== null && event.target.files[0]) {
-                  uploadFile(event.target.files[0])
-                }
-              }}
+              onChange={onFileInputChange}
             />
           </div>
         </div>
       </div>
       <div className={styles.buttons}>
-        {isComplete ? (
-          <button
+        {<button
             onClick={() => {
               completeToggle(id)
             }}
-          >
-            Complete
-          </button>
-        ) : (
-          <button
-            onClick={() => {
-              completeToggle(id)
-            }}
-          >
-            Active
-          </button>
-        )}
+        >
+          {isComplete ? 'Complete' : 'Active'}
+        </button>}
         <button onClick={showModal}> Edit</button>
         <button
           onClick={() => {
