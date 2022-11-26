@@ -21,19 +21,19 @@ export const ModalForm: FC<Props> = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<any>()
+  } = useForm<TaskType>()
 
   const handleCancel = () => {
     setIsModalOpen(false)
     reset()
   }
 
-  const handleAcceptCallback = (data: any) => {
+  const handleAcceptCallback: SubmitHandler<TaskType> = (data) => {
     if (id) {
       data.id = id
     }
+
     data.endDate = dayjs(data.endDate).format('DD.MM.YYYY')
-    console.log(data)
     handleAccept(data)
     setIsModalOpen(false)
     reset()
@@ -77,7 +77,7 @@ export const ModalForm: FC<Props> = ({
               {...register('endDate', {
                 required: true,
                 value: endDateValue
-                  ? dayjs(endDateValue).format('YYYY-DD-MM')
+                  ? dayjs(endDateValue, 'DD.MM.YYYY').format('YYYY-MM-DD')
                   : '',
               })}
               type={'date'}

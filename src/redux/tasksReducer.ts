@@ -1,7 +1,6 @@
 import { AppStateType, BaseThunk, InferActionsType } from './store'
 import { ThunkDispatch } from 'redux-thunk'
-import { TasksAPI } from '../api/api'
-import { EditData } from '../components/Tasks/Task'
+import { TasksAPI } from '../api/tasks'
 
 const ADD_TASK = 'tasks/ADD_TASK'
 const DELETE_TASK = 'tasks/DELETE_TASK'
@@ -39,7 +38,7 @@ const tasksReducer = (
           if (t.id === action.payload.taskId) {
             return {
               ...t,
-              isComplete: action.payload.value
+              isComplete: action.payload.value,
             }
           }
           return t
@@ -55,7 +54,7 @@ const tasksReducer = (
               ...t,
               title: action.payload.title,
               text: action.payload.text,
-              endDate: action.payload.endDate
+              endDate: action.payload.endDate,
             }
           }
           return t
@@ -75,7 +74,7 @@ const tasksReducer = (
           if (t.id === action.payload.taskId) {
             return {
               ...t,
-              files: [...t.files, action.payload.file]
+              files: [...t.files, action.payload.file],
             }
           }
           return t
@@ -89,7 +88,7 @@ const tasksReducer = (
           if (t.id === action.payload.taskId) {
             return {
               ...t,
-              files: t.files.filter(f => f.id !== action.payload.fileId)
+              files: t.files.filter((f) => f.id !== action.payload.fileId),
             }
           }
           return t
@@ -115,9 +114,9 @@ export const actions = {
   setTasks: (tasks: TaskType[]) =>
     ({ type: SET_TASKS, payload: tasks } as const),
   addFile: (file: FileData, taskId: string) =>
-      ({ type: ADD_FILE, payload: { file, taskId } } as const),
+    ({ type: ADD_FILE, payload: { file, taskId } } as const),
   deleteFile: (fileId: string, taskId: string) =>
-      ({ type: DELETE_FILE, payload: { fileId, taskId } } as const),
+    ({ type: DELETE_FILE, payload: { fileId, taskId } } as const),
 }
 
 export const addTask =
@@ -130,9 +129,9 @@ export const addTask =
         isComplete: false,
         files: [],
       }
-      const id = await TasksAPI.addTask(newTask);
-      
-      dispatch(actions.addTask({ id, ...newTask }));
+      const id = await TasksAPI.addTask(newTask)
+
+      dispatch(actions.addTask({ id, ...newTask }))
     } catch (e) {
       alert('failed to add task ' + e)
     }
@@ -142,7 +141,7 @@ export const editTask =
   async (dispatch) => {
     try {
       dispatch(actions.editTask(task.id, task.title, task.text, task.endDate))
-      await TasksAPI.editTask(task);
+      await TasksAPI.editTask(task)
     } catch (e) {
       alert('failed to edit task ' + e)
     }
@@ -152,7 +151,7 @@ export const deleteTask =
   async (dispatch) => {
     try {
       dispatch(actions.deleteTask(taskId))
-      await TasksAPI.deleteTask(taskId);
+      await TasksAPI.deleteTask(taskId)
     } catch (e) {
       alert('failed to delete task ' + e)
     }
@@ -162,7 +161,7 @@ export const toggleComplete =
   async (dispatch) => {
     try {
       dispatch(actions.toggleComplete(taskId, value))
-      await TasksAPI.toggleComplete(taskId, value);
+      await TasksAPI.toggleComplete(taskId, value)
     } catch (e) {
       alert('failed to toggle complete task ' + e)
     }
@@ -186,15 +185,15 @@ export const uploadFile =
     }
   }
 export const deleteFile =
-    (taskId: string, file: FileData): Thunk =>
-        async (dispatch) => {
-          try {
-            dispatch(actions.deleteFile(file.id, taskId))
-            await TasksAPI.deleteFile(taskId, file)
-          } catch (e) {
-            alert('failed to delete file ' + e)
-          }
-        }
+  (taskId: string, file: FileData): Thunk =>
+  async (dispatch) => {
+    try {
+      dispatch(actions.deleteFile(file.id, taskId))
+      await TasksAPI.deleteFile(taskId, file)
+    } catch (e) {
+      alert('failed to delete file ' + e)
+    }
+  }
 
 export default tasksReducer
 type Thunk = BaseThunk<Actions, void>
@@ -213,13 +212,20 @@ export type TaskType = {
   text: string
   endDate: string
   isComplete: boolean
-  createdAt: number;
+  createdAt: number
   id: string
   files: FileData[]
 }
 
 export type FileData = {
-  id: string;
+  id: string
   name: string
   url: string
+}
+
+export type EditData = {
+  id: string
+  title: string
+  text: string
+  endDate: string
 }

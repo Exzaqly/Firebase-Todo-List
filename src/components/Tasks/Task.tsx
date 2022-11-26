@@ -1,8 +1,11 @@
 import { ChangeEvent, FC, useEffect, useState } from 'react'
 import {
+  deleteFile,
   deleteTask,
   Dispatch,
+  EditData,
   editTask,
+  FileData,
   TaskType,
   toggleComplete,
   uploadFile,
@@ -35,14 +38,6 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
     setIsExpired(
       dayjs(endDate, 'DD.MM.YYYY').valueOf() < getTimestamp(new Date())
     )
-
-    if (isExpired) return
-
-    const timeout = setTimeout(
-      () => setIsExpired(true),
-      dayjs(endDate, 'DD.MM.YYYY').valueOf() - getTimestamp(new Date())
-    )
-    return () => clearTimeout(timeout)
   }, [endDate])
 
   const taskDelete = (taskId: string) => {
@@ -61,18 +56,17 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
     setIsEditModalOpen(false)
   }
 
+  const deleteFileCallback = (file: FileData) => {
+    dispatch(deleteFile(id, file))
+  }
+
   const onFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files !== null && e.target.files[0]) {
       dispatch(uploadFile(id, e.target.files[0]))
       // @ts-ignore reset file input
-      e.target.value = null;
+      e.target.value = null
     }
   }
-
-  /*  const buttonStyle = {
-    marginBottom: '5px',
-    width: '120px',
-  }*/
 
   return (
     <div
@@ -86,35 +80,50 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
         <span>{endDate}</span>
       </div>
       <div className={styles.textContainer}>
-        <div>
+        <div className={styles.text}>
           <p>{text}</p>
         </div>
-        <div>
-          <div>
-            {files?.map((f, index) => (
+        <div className={styles.files}>
+          <div className={styles.files_block}>
+            {files?.map((f) => (
+              <div className={styles.file}>
                 <a key={f.id} href={f.url}>
                   {f.name}
                 </a>
+                <button
+                  className={styles.files_delete}
+                  onClick={() => {
+                    deleteFileCallback(f)
+                  }}
+                >
+                  &#10006;
+                </button>
+              </div>
             ))}
-          </div>
-          <div>
-            <input
-              type="file"
-              onChange={onFileInputChange}
-            />
           </div>
         </div>
       </div>
       <div className={styles.buttons}>
-        {<button
+        <label className={styles.input_file}>
+          <input onChange={onFileInputChange} type="file" name="file" />
+          <span>Select file</span>
+        </label>
+        {
+          <button
+            className={styles.button}
             onClick={() => {
               completeToggle(id)
             }}
-        >
-          {isComplete ? 'Complete' : 'Active'}
-        </button>}
-        <button onClick={showModal}> Edit</button>
+          >
+            {isComplete ? 'Complete' : 'Active'}
+          </button>
+        }
+        <button className={styles.button} onClick={showModal}>
+          {' '}
+          Edit
+        </button>
         <button
+          className={styles.button}
           onClick={() => {
             taskDelete(id)
           }}
@@ -135,11 +144,4 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
       )}
     </div>
   )
-}
-
-export type EditData = {
-  id: string
-  title: string
-  text: string
-  endDate: string
 }
