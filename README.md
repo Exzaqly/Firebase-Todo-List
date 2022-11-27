@@ -1,6 +1,10 @@
-# Getting Started with Create React App
+# Тестовое задание для WomanUP
+Реализован весь функционал, описанный в задаче. А так же:
+- использован firebase.google.com для бэкенда и деплоя
+- использована библиотека dayjs
+- использован less
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Приложение хостится по ссылке: https://fir-todo-list-933b8.web.app/
 
 ## Available Scripts
 

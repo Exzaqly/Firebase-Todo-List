@@ -8,7 +8,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  &_content{
+
+  &_content {
     padding: 20px;
     border-radius: 12px;
     background-color: white;
@@ -21,10 +22,11 @@
   width: 470px;
   border: 2px solid lightgray;
   border-radius: 5px;
-  &_date{
-    width: 100px;
+
+  &_date {
+    width: 120px;
     margin-left: 50px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     padding: 5px;
   }
 }
@@ -39,16 +41,18 @@
   resize: none;
 }
 
-.error{
-    color: #bf1650;
+.error {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #bf1650;
 
-    &::before {
-      display: inline;
-      content: "⚠ ";
-    }
+  &::before {
+    display: inline;
+    content: "⚠ ";
+  }
 }
 
-form{
+form {
   button {
     margin-bottom: 5px;
     margin-right: 5px;
@@ -57,7 +61,7 @@ form{
     background-color: #fff;
     border: 1px solid grey;
 
-    &:hover{
+    &:hover {
       cursor: pointer;
       color: #40a9ff;
       border-color: #40a9ff;
@@ -65,3 +69,12 @@ form{
   }
 }
 
+@media (max-width: 868px) {
+  .input {
+    width: 270px;
+  }
+
+  .textarea {
+    width: 270px;
+  }
+}

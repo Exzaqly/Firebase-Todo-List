@@ -2,9 +2,13 @@ import { FC, useState } from 'react'
 import { ModalForm } from '../Modal/ModalForm'
 import styles from './Header.module.less'
 import { useDispatch } from 'react-redux'
-import { addTask, Dispatch, NewTask } from '../../redux/tasksReducer'
-import dayjs from 'dayjs'
+import { addTask, Dispatch, TaskType } from '../../redux/tasksReducer'
+import { SubmitHandler } from 'react-hook-form'
 
+/**
+ * Header component
+ * @returns {React.ReactElement}
+ */
 export const Header: FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const dispatch: Dispatch = useDispatch()
@@ -13,7 +17,7 @@ export const Header: FC = () => {
     setIsAddModalOpen(true)
   }
 
-  const handleAddTask = (data: any) => {
+  const handleAddTask: SubmitHandler<TaskType> = (data) => {
     dispatch(addTask(data))
   }
 
@@ -24,7 +28,7 @@ export const Header: FC = () => {
         <ModalForm
           handleAccept={handleAddTask}
           modalTitle={'Add task: '}
-          setIsModalOpen={setIsAddModalOpen}
+          onModalClose={() => setIsAddModalOpen(false)}
         />
       )}
     </div>

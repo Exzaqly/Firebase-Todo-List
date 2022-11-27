@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals'
 import { Provider } from 'react-redux'
 import store from './redux/store'
 import { Dispatch, getTasks } from './redux/tasksReducer'
+
 const dispatch: Dispatch = store.dispatch
 
 dispatch(getTasks())

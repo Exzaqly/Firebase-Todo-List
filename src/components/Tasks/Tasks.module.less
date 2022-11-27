@@ -7,65 +7,77 @@
   border: black 1px solid;
   border-radius: 10px;
 }
+
 .complete {
-  background-color: rgba(0,256,0, 0.5);
+  background-color: rgba(0, 256, 0, 0.5);
 }
+
 .expired {
   background-color: #e9e9e9;
 }
+
 .titleContainer {
   display: grid;
   grid-area: t;
   grid-template-columns: 5fr 1fr;
   border-bottom: 1px solid black;
+
   span {
     padding: 20px 10px 10px 10px;
     text-align: center;
   }
+
   h2 {
     padding: 20px 10px 10px 10px;
     border-right: 1px solid black;
     margin: 0;
   }
 }
+
 .textContainer {
   display: flex;
   justify-content: space-between;
   padding: 10px;
   grid-area: p;
+
   p {
     margin-bottom: 0;
   }
 }
+
 .buttons {
   grid-area: b;
   display: grid;
   justify-content: right;
   padding: 5px;
   border-left: 1px black solid;
-  .button{
+
+  .button {
     height: 32px;
     margin-bottom: 6px;
     width: 120px;
     background-color: #fff;
     border: 1px solid grey;
 
-    &:hover{
+    &:hover {
       cursor: pointer;
       color: #40a9ff;
       border-color: #40a9ff;
     }
   }
+
 }
 
-.files{
+.files {
   display: flex;
-  &_block{
+
+  &_block {
     display: flex;
     flex-direction: column;
     margin-bottom: 5px;
   }
-  &_delete{
+
+  &_delete {
     padding: 2px 5px;
     border-radius: 100%;
     text-align: center;
@@ -73,7 +85,8 @@
     background-color: #fff;
     border: 1px solid grey;
     margin-left: 5px;
-    &:hover{
+
+    &:hover {
       cursor: pointer;
       color: #40a9ff;
       border-color: #40a9ff;
@@ -85,6 +98,7 @@
   box-sizing: border-box;
   display: flex;
   margin-bottom: 6px;
+
   span {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -97,6 +111,7 @@
     text-align: center;
     box-sizing: border-box;
   }
+
   input[type=file] {
     z-index: -1;
     opacity: 0;
@@ -104,14 +119,30 @@
     width: 0;
     height: 0;
   }
+
   &:hover {
     span {
-        color: #40a9ff;
-        border-color: #40a9ff;
+      color: #40a9ff;
+      border-color: #40a9ff;
     }
   }
 }
 
-.text{
+.text {
   word-break: break-all;
+}
+
+@media (max-width: 468px) {
+  .task {
+    grid-template-areas: 't t t b' 'p p p b';
+  }
+  .input_file span{
+    width: 75px;
+  }
+  .buttons{
+    width: 80px;
+    .button {
+      width: 75px
+    }
+  }
 }

@@ -7,13 +7,18 @@ import dayjs from 'dayjs'
 const customParseFormat = require('dayjs/plugin/customParseFormat')
 dayjs.extend(customParseFormat)
 
+/**
+ * ModalForm component
+ * @param {Props} props - Props.
+ * @returns {React.ReactElement}
+ */
 export const ModalForm: FC<Props> = ({
   endDateValue,
   handleAccept,
   titleValue,
   modalTitle,
   textValue,
-  setIsModalOpen,
+  onModalClose,
   id,
 }) => {
   const {
@@ -24,7 +29,7 @@ export const ModalForm: FC<Props> = ({
   } = useForm<TaskType>()
 
   const handleCancel = () => {
-    setIsModalOpen(false)
+    onModalClose()
     reset()
   }
 
@@ -35,17 +40,12 @@ export const ModalForm: FC<Props> = ({
 
     data.endDate = dayjs(data.endDate).format('DD.MM.YYYY')
     handleAccept(data)
-    setIsModalOpen(false)
+    onModalClose()
     reset()
   }
 
   return (
-    <div
-      className={styles.modal}
-      onClick={() => {
-        setIsModalOpen(false)
-      }}
-    >
+    <div className={styles.modal} onClick={onModalClose}>
       <div
         className={styles.modal_content}
         onClick={(e) => e.stopPropagation()}
@@ -56,7 +56,7 @@ export const ModalForm: FC<Props> = ({
             <input
               className={styles.input}
               {...register('title', {
-                value: titleValue ? titleValue : '',
+                value: titleValue ?? '',
               })}
               placeholder={'title'}
             />
@@ -64,7 +64,7 @@ export const ModalForm: FC<Props> = ({
           <div>
             <textarea
               {...register('text', {
-                value: textValue ? textValue : '',
+                value: textValue ?? '',
               })}
               placeholder={'task'}
               className={styles.textarea}
@@ -75,15 +75,22 @@ export const ModalForm: FC<Props> = ({
             <input
               className={styles.input_date}
               {...register('endDate', {
-                required: true,
+                required: {
+                  value: true,
+                  message: 'This field is required',
+                },
+                pattern: {
+                  value: /^[^0]\d{3}-\d{2}-\d{2}$/,
+                  message: 'Date is invalid',
+                },
                 value: endDateValue
                   ? dayjs(endDateValue, 'DD.MM.YYYY').format('YYYY-MM-DD')
                   : '',
               })}
               type={'date'}
             />
-            {errors?.endDate?.type === 'required' && (
-              <p className={styles.error}>This field is required</p>
+            {errors?.endDate?.message && (
+              <p className={styles.error}>{errors.endDate.message}</p>
             )}
           </div>
           <button type={'submit'} onClick={handleSubmit(handleAcceptCallback)}>
@@ -98,7 +105,7 @@ export const ModalForm: FC<Props> = ({
 
 type Props = {
   handleAccept: SubmitHandler<TaskType>
-  setIsModalOpen: (value: boolean) => void
+  onModalClose: () => void
   modalTitle: string
   titleValue?: string
   textValue?: string

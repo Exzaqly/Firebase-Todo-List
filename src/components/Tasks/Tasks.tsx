@@ -4,6 +4,10 @@ import { Dispatch, TaskType } from '../../redux/tasksReducer'
 import { getTasksSelector } from '../../redux/selectors'
 import { Task } from './Task'
 
+/**
+ * Tasks component
+ * @returns {React.ReactElement}
+ */
 export const Tasks: FC = () => {
   const tasks = useSelector(getTasksSelector)
   return (

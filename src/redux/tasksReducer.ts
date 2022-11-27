@@ -119,6 +119,11 @@ export const actions = {
     ({ type: DELETE_FILE, payload: { fileId, taskId } } as const),
 }
 
+/**
+ * Add task
+ * @param {Omit<TaskType, 'id'>} task - New task data.
+ * @returns {Thunk}
+ */
 export const addTask =
   (task: Omit<TaskType, 'id'>): Thunk =>
   async (dispatch) => {
@@ -136,6 +141,12 @@ export const addTask =
       alert('failed to add task ' + e)
     }
   }
+
+/**
+ * * Edit task
+ * @param {EditData}  task - edited task data
+ * @return{Thunk}
+ */
 export const editTask =
   (task: EditData): Thunk =>
   async (dispatch) => {
@@ -146,8 +157,14 @@ export const editTask =
       alert('failed to edit task ' + e)
     }
   }
+
+/**
+ * * Delete task
+ * @param {TaskType['id']}  taskId- task id
+ * @return{Thunk}
+ */
 export const deleteTask =
-  (taskId: string): Thunk =>
+  (taskId: TaskType['id']): Thunk =>
   async (dispatch) => {
     try {
       dispatch(actions.deleteTask(taskId))
@@ -156,8 +173,15 @@ export const deleteTask =
       alert('failed to delete task ' + e)
     }
   }
+
+/**
+ * * Toggle complete
+ * @param {TaskType['id']}  taskId - task id
+ * @param {TaskType['isComplete']} value - isComplete task value
+ * @return{Thunk}
+ */
 export const toggleComplete =
-  (taskId: string, value: boolean): Thunk =>
+  (taskId: TaskType['id'], value: TaskType['isComplete']): Thunk =>
   async (dispatch) => {
     try {
       dispatch(actions.toggleComplete(taskId, value))
@@ -166,6 +190,11 @@ export const toggleComplete =
       alert('failed to toggle complete task ' + e)
     }
   }
+
+/**
+ * * Get tasks
+ * @return{Thunk}
+ */
 export const getTasks = (): Thunk => async (dispatch) => {
   try {
     const tasks = await TasksAPI.getTasks()
@@ -174,6 +203,12 @@ export const getTasks = (): Thunk => async (dispatch) => {
     alert('failed to load tasks ' + e)
   }
 }
+
+/**
+ * Upload file
+ * @param {TaskType['id'] }  taskId - task id
+ * @param {Blob} file - uploaded file
+ */
 export const uploadFile =
   (taskId: string, file: Blob): Thunk =>
   async (dispatch) => {
@@ -184,8 +219,15 @@ export const uploadFile =
       alert('failed to upload file ' + e)
     }
   }
+
+/**
+ * * Delete file
+ * @param {TaskType['id'] }  taskId - task id
+ * @param {FileData} file - task file data to delete
+ * @return{Thunk}
+ */
 export const deleteFile =
-  (taskId: string, file: FileData): Thunk =>
+  (taskId: TaskType['id'], file: FileData): Thunk =>
   async (dispatch) => {
     try {
       dispatch(actions.deleteFile(file.id, taskId))
@@ -200,12 +242,6 @@ type Thunk = BaseThunk<Actions, void>
 type initialStateType = typeof initialState
 type Actions = InferActionsType<typeof actions>
 export type Dispatch = ThunkDispatch<AppStateType, any, Actions>
-
-export type NewTask = {
-  title: string
-  text: string
-  endDate: string
-}
 
 export type TaskType = {
   title: string

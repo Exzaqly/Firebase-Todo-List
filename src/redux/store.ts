@@ -1,4 +1,10 @@
-import { Action, applyMiddleware, combineReducers, createStore } from 'redux'
+import {
+  Action,
+  applyMiddleware,
+  combineReducers,
+  createStore,
+  compose,
+} from 'redux'
 import thunkMiddleWare, { ThunkAction } from 'redux-thunk'
 import tasksReducer from './tasksReducer'
 
@@ -28,4 +34,3 @@ export type BaseThunk<A extends Action, R = Promise<void>> = ThunkAction<
   any,
   A
 >
-export type AppDispatch = typeof store.dispatch

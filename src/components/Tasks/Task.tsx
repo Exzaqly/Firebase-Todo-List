@@ -15,7 +15,13 @@ import styles from './Tasks.module.less'
 import cn from 'classnames'
 import { ModalForm } from '../Modal/ModalForm'
 import dayjs from 'dayjs'
+import { isTaskExpired } from '../../helpers'
 
+/**
+ * Task component
+ * @param {Omit<TaskType, 'createdAt'>} props - Props.
+ * @returns {React.ReactElement}
+ */
 export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
   title,
   text,
@@ -24,46 +30,36 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
   id,
   files,
 }) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isExpired, setIsExpired] = useState(
-    dayjs(endDate, 'DD.MM.YYYY').valueOf() < getTimestamp(new Date())
-  )
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isExpired, setIsExpired] = useState(isTaskExpired(endDate))
   const dispatch: Dispatch = useDispatch()
 
-  function getTimestamp(date: Date) {
-    return dayjs(dayjs(date).format('DD.MM.YYYY'), 'DD.MM.YYYY').valueOf()
-  }
-
   useEffect(() => {
-    setIsExpired(
-      dayjs(endDate, 'DD.MM.YYYY').valueOf() < getTimestamp(new Date())
-    )
+    setIsExpired(isTaskExpired(endDate))
     if (isExpired) return
+
     const timeout = setTimeout(
       () => setIsExpired(true),
-      dayjs(endDate, 'DD.MM.YYYY').valueOf() - getTimestamp(new Date())
+      dayjs(endDate, 'DD.MM.YYYY').endOf('date').diff(dayjs())
     )
     return () => clearTimeout(timeout)
   }, [endDate])
 
-  const taskDelete = (taskId: string) => {
-    dispatch(deleteTask(taskId))
-  }
-  const completeToggle = (taskId: string) => {
-    dispatch(toggleComplete(taskId, !isComplete))
+  const handleTaskDelete = () => {
+    dispatch(deleteTask(id))
   }
 
-  const showModal = () => {
-    setIsEditModalOpen(true)
+  const handleCompleteToggle = () => {
+    dispatch(toggleComplete(id, !isComplete))
+  }
+
+  const handleFileDelete = (file: FileData) => {
+    dispatch(deleteFile(id, file))
   }
 
   const handleSubmit = (data: EditData) => {
     dispatch(editTask(data))
-    setIsEditModalOpen(false)
-  }
-
-  const deleteFileCallback = (file: FileData) => {
-    dispatch(deleteFile(id, file))
+    setIsModalOpen(false)
   }
 
   const onFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -77,13 +73,16 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
   return (
     <div
       className={cn(
-        { [styles.complete]: isComplete, [styles.expired]: isExpired },
+        {
+          [styles.complete]: isComplete,
+          [styles.expired]: !isComplete && isExpired,
+        },
         styles.task
       )}
     >
       <div className={styles.titleContainer}>
         <h2>{title}</h2>
-        <span>{endDate}</span>
+        <span>{dayjs(endDate, 'DD.MM.YYYY').format('MMMM D, YYYY')}</span>
       </div>
       <div className={styles.textContainer}>
         <div className={styles.text}>
@@ -99,7 +98,7 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
                 <button
                   className={styles.files_delete}
                   onClick={() => {
-                    deleteFileCallback(f)
+                    handleFileDelete(f)
                   }}
                 >
                   &#10006;
@@ -115,32 +114,22 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
           <span>Select file</span>
         </label>
         {
-          <button
-            className={styles.button}
-            onClick={() => {
-              completeToggle(id)
-            }}
-          >
-            {isComplete ? 'Complete' : 'Active'}
+          <button className={styles.button} onClick={handleCompleteToggle}>
+            {isComplete ? 'Completed' : 'Active'}
           </button>
         }
-        <button className={styles.button} onClick={showModal}>
+        <button className={styles.button} onClick={() => setIsModalOpen(true)}>
           {' '}
           Edit
         </button>
-        <button
-          className={styles.button}
-          onClick={() => {
-            taskDelete(id)
-          }}
-        >
+        <button className={styles.button} onClick={handleTaskDelete}>
           Delete{' '}
         </button>
       </div>
-      {isEditModalOpen && (
+      {isModalOpen && (
         <ModalForm
           handleAccept={handleSubmit}
-          setIsModalOpen={setIsEditModalOpen}
+          onModalClose={() => setIsModalOpen(false)}
           modalTitle={'Edit task: '}
           titleValue={title}
           textValue={text}
