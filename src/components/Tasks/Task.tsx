@@ -92,7 +92,7 @@ export const Task: FC<Omit<TaskType, 'createdAt'>> = ({
           <div className={styles.files_block}>
             {files?.map((f) => (
               <div className={styles.file} key={f.id}>
-                <a href={f.url} download={f.url}>
+                <a href={f.url} target="_blank" rel="noopener noreferrer">
                   {f.name}
                 </a>
                 <button
